@@ -6,14 +6,15 @@ async function createUser(event) {
     
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
-    const key = document.getElementById('key').value;
-    const is2FAEnabled = document.getElementById('is2FAEnabled').checked;
+
+    // Generar clave secreta usando speakeasy
+    const secret = speakeasy.generateSecret({ length: 20 });
 
     const user = {
         username: username,
         password: password,
-        key: key,
-        is2FAEnabled: is2FAEnabled,
+        key: secret.hex,
+        is2FAEnabled: false,
         counter: 0
     };
 
@@ -30,7 +31,8 @@ async function createUser(event) {
             const newUser = await response.json();
             addUserToList(newUser);
         } else {
-            console.error('Error creando usuario:', response.statusText);
+            const errorData = await response.json();
+            console.error('Error creando usuario:', response.statusText, errorData);
         }
     } catch (error) {
         console.error('Error creando usuario:', error);
@@ -41,8 +43,12 @@ async function createUser(event) {
 async function getUsers() {
     try {
         const response = await fetch(apiUrl);
-        const users = await response.json();
-        users.forEach(user => addUserToList(user));
+        if (response.ok) {
+            const users = await response.json();
+            users.forEach(user => addUserToList(user));
+        } else {
+            console.error('Error obteniendo usuarios:', response.statusText);
+        }
     } catch (error) {
         console.error('Error obteniendo usuarios:', error);
     }
