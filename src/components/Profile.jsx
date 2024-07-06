@@ -45,7 +45,10 @@ const Profile = () => {
   };
 
   const generateSecretKey = async () => {
+    //La generación del secret key de cada usuario puede ser personalizada dependiendo de las necesidades
     const secret = speakeasy.generateSecret({ length: 20 });
+    //El encoding al guardar / crear la secret key es lo mas importante debido a que esto debe ser el mismo encoding 
+    //que en la creación del código qr que enlaza la WepApp con su autenticador 
     setSecretKey(secret.hex);
 
     try {
